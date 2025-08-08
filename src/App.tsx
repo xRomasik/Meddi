@@ -51,7 +51,11 @@ function App() {
       <header>
         <h1>User List</h1>
         <div className="controls">
+          <label htmlFor="filter-input" className="sr-only">
+            Filter by name or email
+          </label>
           <input
+            id="filter-input"
             type="text"
             placeholder="Filter by name or email"
             value={filter}
@@ -61,27 +65,26 @@ function App() {
       </header>
       <main>
         <section>
-
-        {filteredUsers.length > 0 ? (
-          <ul>
-            {filteredUsers.map((user) => (
-              <li key={user.uuid}>
-                <ImageWithLoader
-                  src={`${user.avatar.url}?random=${user.uuid}`}
-                  alt={`${user.first_name} ${user.last_name}`}
+          {filteredUsers.length > 0 ? (
+            <ul>
+              {filteredUsers.map((user) => (
+                <li key={user.uuid}>
+                  <ImageWithLoader
+                    src={`${user.avatar.url}?random=${user.uuid}`}
+                    alt={`${user.first_name} ${user.last_name}`}
                   />
-                <div>
-                  <p>
-                    {user.first_name} {user.last_name}
-                  </p>
-                  <p>{user.email}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>No users found.</p>
-        )}
+                  <div>
+                    <p>
+                      {user.first_name} {user.last_name}
+                    </p>
+                    <p>{user.email}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>No users found.</p>
+          )}
         </section>
       </main>
     </div>
