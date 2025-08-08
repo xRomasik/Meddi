@@ -1,8 +1,13 @@
-import { useState, useEffect, useMemo } from "react";
-import "./App.css";
+import { useState} from "react";
 import ImageWithLoader from "./components/ImageWithLoader";
+import { useFetch } from "./hooks/useFecth";
+import "./App.css";
 
-interface User {
+type FakerApiResponse = {
+  data: User[];
+};
+
+type User = {
   uuid: string;
   first_name: string;
   last_name: string;
@@ -10,41 +15,33 @@ interface User {
   avatar: {
     url: string;
   };
-}
+};
 
 function App() {
-  const [users, setUsers] = useState<User[]>([]);
   const [filter, setFilter] = useState("");
-
-  const fetchUsers = async () => {
-    try {
-      const userResponse = await fetch(
-        "https://fakerapi.it/api/v2/custom?_quantity=20&_locale=cs_CZ&uuid=uuid&first_name=firstName&last_name=lastName&email=email&avatar=image"
-      );
-      const userResponseJson = await userResponse.json();
-      setUsers(userResponseJson.data);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const filteredUsers = useMemo(
-    () =>
-      users.filter((user) => {
-        const lowerCaseFilter = filter.toLowerCase();
-
-        return (
-          user.first_name.toLowerCase().includes(lowerCaseFilter) ||
-          user.last_name.toLowerCase().includes(lowerCaseFilter) ||
-          user.email.toLowerCase().includes(lowerCaseFilter)
-        );
-      }),
-    [users, filter]
+  const { data, isError, isLoading } = useFetch<FakerApiResponse>(
+    "https://fakerapi.it/api/v2/custom?_quantity=20&_locale=cs_CZ&uuid=uuid&first_name=firstName&last_name=lastName&email=email&avatar=image"
   );
+
+  if (isLoading) {
+    return <div className="loading-container">Loading ...</div>;
+  }
+
+  if (isError) {
+    return <div className="error-container">Error</div>;
+  }
+
+  const { data: users } = data;
+
+  const filteredUsers = users.filter((user) => {
+    const lowerCaseFilter = filter.toLowerCase();
+
+    return (
+      user.first_name.toLowerCase().includes(lowerCaseFilter) ||
+      user.last_name.toLowerCase().includes(lowerCaseFilter) ||
+      user.email.toLowerCase().includes(lowerCaseFilter)
+    );
+  });
 
   return (
     <div className="App">

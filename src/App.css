@@ -106,3 +106,16 @@ p {
   margin: 0;
   word-break: break-all;
 }
+
+.loading-container, .error-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    font-size: 1.5rem;
+}
+
+.error-container {
+    color: #d9534f;
+    font-weight: bold;
+}
