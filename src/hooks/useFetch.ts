@@ -34,47 +34,67 @@ export const useFetch = <T>(url: string): useFetchReturn<T> => {
     isLoading: true,
     data: null,
   });
+  const abortControllerRef = useRef<null | AbortController>(null);
   const fetchIdRef = useRef(0);
 
   const fetchData = useCallback(async () => {
     const fetchId = ++fetchIdRef.current;
 
-    const controller = new AbortController();
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort("Old request");
+    }
 
-    setState({
-      data: state.data,
+    const abortController = new AbortController();
+    abortControllerRef.current = abortController;
+
+    setState((prev) => ({
+      data: prev.data,
       isError: false,
       isLoading: true,
-    });
+    }));
 
-    const data: Response = await fetch(url, { signal: controller.signal });
-
-    if (fetchId !== fetchIdRef.current) {
-      return;
-    }
-
-    if (!data.ok) {
-      setState({
-        data: null,
-        isError: true,
-        isLoading: false,
+    try {
+      const data: Response = await fetch(url, {
+        signal: abortController.signal,
       });
 
-      return;
+      if (fetchId !== fetchIdRef.current) {
+        return;
+      }
+
+      if (!data.ok) {
+        setState({
+          data: null,
+          isError: true,
+          isLoading: false,
+        });
+
+        return;
+      }
+
+      const parsedData: T = await data.json();
+
+      setState({
+        data: parsedData,
+        isError: false,
+        isLoading: false,
+      });
+    } catch (err) {
+      console.error(err);
     }
-
-    const parsedData: T = await data.json();
-
-    setState({
-      data: parsedData,
-      isError: false,
-      isLoading: false,
-    });
   }, [url]);
+
+  const refetch = useCallback(() => {
+    return fetchData();
+  }, [fetchData]);
 
   useEffect(() => {
     fetchData();
+
+    return () => {
+      abortControllerRef.current?.abort("Dismount");
+    };
   }, [url]);
 
-  return { ...state, refetch: fetchData };
+  return { ...state, refetch };
 };

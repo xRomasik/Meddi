@@ -58,8 +58,8 @@ function App() {
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           />
-        </div>
         <button onClick={() => refetch()}>Refetch</button>
+        </div>
       </header>
       <main>
         <section>
