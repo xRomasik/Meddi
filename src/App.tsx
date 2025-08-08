@@ -43,7 +43,7 @@ function App() {
           user.email.toLowerCase().includes(lowerCaseFilter)
         );
       }),
-    [users]
+    [users, filter]
   );
 
   return (
