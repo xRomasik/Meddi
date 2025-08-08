@@ -1,6 +1,6 @@
-import { useState} from "react";
+import { useState } from "react";
 import ImageWithLoader from "./components/ImageWithLoader";
-import { useFetch } from "./hooks/useFecth";
+import { useFetch } from "./hooks/useFetch";
 import "./App.css";
 
 type FakerApiResponse = {
@@ -19,7 +19,7 @@ type User = {
 
 function App() {
   const [filter, setFilter] = useState("");
-  const { data, isError, isLoading } = useFetch<FakerApiResponse>(
+  const { data, isError, isLoading, refetch } = useFetch<FakerApiResponse>(
     "https://fakerapi.it/api/v2/custom?_quantity=20&_locale=cs_CZ&uuid=uuid&first_name=firstName&last_name=lastName&email=email&avatar=image"
   );
 
@@ -59,6 +59,7 @@ function App() {
             onChange={(e) => setFilter(e.target.value)}
           />
         </div>
+        <button onClick={() => refetch()}>Refetch</button>
       </header>
       <main>
         <section>
